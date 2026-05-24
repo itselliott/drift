@@ -1,65 +1,125 @@
 # DRIFT
 
-A hybrid analog/digital echo plugin in the spirit of the early-80s rack delays — Lexicon PCM 70/42, Korg SDD-3000 — pushed into mis-calibrated, self-eating territory. Companion to [SP·L](https://github.com/itselliott/spool). Windows VST3 + Standalone.
+> **`DF-T`** — a hybrid analog/digital echo plugin in the spirit of the Chase Bliss × Electronic Audio Experiments [**Big Time**](https://www.chasebliss.com/). Six motorised faders, four feedback states, infinite hold, and a shared-memory link to its sibling plugin [**SP·L**](https://github.com/itselliott/spool).
+>
+> Open source. GPL-3.0. VST3 + Standalone. Windows-first (macOS / Linux build from source).
 
-> Inspired by Chase Bliss + Electronic Audio Experiments' **Big Time** pedal: analog preamp into a digital delay engine into an analog feedback limiter. The limiter is the secret — pushed-up feedback gets compressed, then re-amplified, then compressed again, creating exponentially-evolving smear that slowly eats itself.
+**[→ drift website + full manual](https://itselliott.github.io/drift/)**
 
-## v1.0 controls
+---
 
-Six faders, four modes, three limiter states. Six faders run CC 14–19 in DAWs.
+## What it does
 
-| Fader | What it does |
-|---|---|
-| **COLOR** | Analog preamp drive. Cranks into harmonic saturation. |
-| **TIME** | Delay time. Range depends on MODE. |
-| **CLUSTER** | Extra delay taps at non-integer ratios → reverb-like smudge. |
-| **TILT** | Filter tilt on the feedback path. Below 0.5 darkens each repeat, above brightens. |
-| **FEEDBACK** | Repeats. With Compressed/Bias state engaged → infinite, self-oscillating. |
-| **WET** | Wet/dry mix. |
+A character-driven delay engine modelled on the early-80s rack delay lineage (PCM 42 / SDD-3000) routed through a deliberately mis-calibrated feedback limiter — pushed-up feedback gets compressed, re-amplified, compressed again, creating exponentially-evolving smear that slowly eats itself.
 
-| MODE | Range | Character |
+**Six motorised faders** with a SHIFT alt-menu that gives you twelve audible parameters from six physical lanes.
+
+| Fader | Main | SHIFT alt |
 |---|---|---|
-| **MOD** | 1–50 ms | Chorus, flanger, doubling with LFO on by default. |
-| **SHORT** | 20–600 ms | Slapback, tape-style short delay. |
-| **LONG** | 100–3000 ms | Long meandering repeats. |
-| **LOOP** | up to 30 s | Infinite-hold mode (full looper in v1.1). |
+| **COLOR** | Preamp drive (JFET-style soft clip + body boost) | **TEXTURE** — state-character knob |
+| **TIME** | Delay-time clock (range depends on MODE) | **RATE** — motion speed / glide time |
+| **CLUSTER** | Three-zone tap scatter (synced → unsynced → drift) | **DEPTH** — motion amplitude |
+| **TILT** | Feedback-path tone, dark↔bright | **CROSSOVER** — TILT split frequency |
+| **FEEDBACK** | Loop gain. Caps depend on STATE | **DIFFUSE** — Schroeder allpass diffusion |
+| **WET** | Wet/dry crossfade (equal-power) | **DRY** — standalone dry-level control |
 
-| STATE | Limiter character |
+**Five cycle buttons** + dedicated SHIFT, plus the alts.
+
+| Button | Main | SHIFT alt |
+|---|---|---|
+| **SCALE** | OFF / CHROMATIC / OCT·4·5 / OCTAVE — TIME quantisation | **SPREAD** — OFF / SUBTLE / PING-PONG |
+| **MOTION** | OFF / SINE / SQUARE / ENV (transient-stepped) | **0.5X** — halves SR + drops to 12-bit |
+| **MODE** | MOD / SHORT / LONG / LOOP — delay-time range | **DIFFUSE TYPE** — doubles DIFFUSE strength |
+| **VOICING** | HIFI / FOCUS / WARM / ANALOG — fixed filter character | **+12 dB** — preamp boost |
+| **STATE** | DIGITAL / COMPRESSED / SATURATED / BIAS — feedback character | — |
+
+**Footswitches.** BYPASS (left, **B**) and TAP TEMPO (right, **Space**).
+
+**HOLD button** (dedicated, **H**). Sticky toggle, mode-dispatched:
+- MOD → **OVERLOAD** (ramps COLOR + FEEDBACK to max while held)
+- SHORT/LONG → **HOLD** (freezes buffer + infinite feedback)
+- LOOP → **DELETE** (wipes loop + snaps TIME to centre)
+
+## Time ranges (per MODE)
+
+| Mode | Range |
 |---|---|
-| **CLEAN** | Transparent peak limiter on the feedback path. |
-| **COMP** | 5:1 compression — the "mis-calibrated PCM42" trick. |
-| **BIAS** | Asymmetric tanh + DC bias creep. Crumbling. |
+| **MOD** | 3 – 46 ms (chorus, flanger, doubling) |
+| **SHORT** | 46 – 736 ms (slapback, tape echo) |
+| **LONG** | 0.7 – 12.2 s (washes, ambient repeats) |
+| **LOOP** | 1 – 29.5 s phrase looper. Carries over from LONG. |
 
-Footswitches: **BYPASS** (left) and **TAP / TEMPO** (right).
+## States
+
+| State | Limiter behaviour | TEXTURE alt |
+|---|---|---|
+| **DIGITAL** | None — clean, transparent | Aliasing + bit-depth crush |
+| **COMPRESSED** | Soft compression + ducking sag | Squeeze amount |
+| **SATURATED** | Pure static tanh waveshaper (no envelope) | Clip symmetry |
+| **BIAS** | Creeping DC misbias → crumbling | Creep speed + clip depth |
+
+## LINQ — works with SP·L
+
+Run DRIFT.exe and [SPOOL.exe](https://github.com/itselliott/spool) as standalones, click the **LINQ pill** in each (next to the wordmark) — audio streams from SP·L's output directly into DRIFT's input via a custom Windows shared-memory ring buffer. No virtual audio cable, no DAW, ~one audio-block of latency.
+
+Pill colours:
+- **dim grey** — LINQ off
+- **amber** — waiting for partner
+- **green** — linked, audio flowing
+- **red** — sample-rate mismatch
+
+## Other features
+
+- **35 factory presets** covering every state / mode / motion / voicing combo. User edits persist.
+- **MIDI Clock in/out** at 24 PPQ — sync delay to host tempo or emit clock for chained pedals.
+- **MIDI CC** for every fader + cycle button (CC 14–32).
+- **MIDI Program Change** recalls preset slots 0–34.
+- **Options Menu** (`O` key): TRAILS · DRY KILL · DRY CLEAN · SCALE IGNORE · STEP · CLOCK OUT.
+- **DRIFT chassis**: charcoal faceplate, wood cheeks, brushed-metal motorised faders, twin red-7-seg OLED (delay-time + preset slot).
 
 ## Build
 
-Requires **CMake 3.22+** and **Visual Studio 2022 Build Tools** on Windows. JUCE 8.0.4 fetched via CMake.
+Requires **CMake 3.22+** and a C++17 toolchain. JUCE 8.0.4 is fetched via CMake's FetchContent.
 
-```powershell
-.\build.ps1                # configure + Release build
-.\build.ps1 -Clean -Run    # clean rebuild, then launch standalone
+```bash
+git clone https://github.com/itselliott/drift.git
+cd drift
+cmake -S . -B build
+cmake --build build --config Release
 ```
 
 Artefacts land under `build/DRIFT_artefacts/Release/`:
-- `Standalone/DRIFT.exe`
-- `VST3/DRIFT.vst3/`
+- `Standalone/DRIFT.exe` — runs as its own app (Windows)
+- `VST3/DRIFT.vst3/` — drop in your VST3 folder
+- `AU/` (macOS only) — drop in `~/Library/Audio/Plug-Ins/Components/`
 
-## Roadmap (v1.1+)
+Windows convenience script:
 
-- Full looper (record / overdub / playback) in LOOP mode
-- Scale-locked time-stepping (Thermae-style)
-- CV / expression-pedal emulation via DAW automation
-- Motorised-fader visualisation
-- MIDI Clock sync, Program Change recall
-- Preset bank
+```powershell
+.\build.ps1                # configure + Release build
+.\build.ps1 -Clean -Run    # clean rebuild + launch standalone
+```
+
+## Hotkeys (standalone + most VST3 hosts)
+
+| Key | Action |
+|---|---|
+| `Space` | TAP tempo (or looper-state cycle in LOOP mode) |
+| `B` | Toggle bypass |
+| `H` | Toggle HOLD gesture (mode-dispatched) |
+| `D` | Delete loop (LOOP mode) |
+| `O` | Open Options menu |
+| `1`–`9`, `0` | Direct-load preset slot 1–10 |
+| `Shift`+`S` | Save current state to active preset slot |
+| `← / →` chevrons (UI) | Cycle presets |
 
 ## Support
 
-Bug reports → [elliottdevs@gmail.com](mailto:elliottdevs@gmail.com?subject=DRIFT%20Bug%20Report).
-
-Tips: [Ko-fi](https://ko-fi.com/itselliott) · [GitHub Sponsors](https://github.com/sponsors/itselliott).
+- **Bug reports** → [GitHub Issues](https://github.com/itselliott/drift/issues) or [elliottdevs@gmail.com](mailto:elliottdevs@gmail.com?subject=DRIFT%20Bug%20Report)
+- **Tips** → [Ko-fi](https://ko-fi.com/itselliott) · [GitHub Sponsors](https://github.com/sponsors/itselliott)
 
 ## License
 
-GPLv3, inherited from JUCE 8. See [juce.com/get-juce/](https://juce.com/get-juce/) for commercial licensing options.
+GPL-3.0. JUCE 8 is GPL-3.0 too — visit [juce.com/get-juce/](https://juce.com/get-juce/) for commercial licensing options.
+
+Not affiliated with Chase Bliss Audio or Electronic Audio Experiments — DRIFT is an independent software reimagining of the Big Time control surface and signal flow.
