@@ -219,10 +219,31 @@ em { color: var(--text-dim); font-style: normal; }
     line-height: 1.1;
 }
 .callout-fine { font-size: 11px; color: var(--text-dim-2); }
-.callout-cb { border-color: rgba(229,58,58,.16); }
-.callout-cb .callout-value { color: var(--accent-bright); }
-.callout-drift { border-color: rgba(74,200,106,.22); }
-.callout-drift .callout-value { color: var(--green); }
+/* Big Time hardware card — greyed and struck-through to mirror SP-L's
+   "expensive thing you're replacing" treatment. */
+.callout-cb { border-color: rgba(255,255,255,.06); }
+.callout-cb .callout-value {
+    color: var(--text-dim-2);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-dim-2);
+}
+/* DRIFT plugin card — accent-coloured with a soft glow, matching SP-L's
+   "$0 in our brand colour" treatment. */
+.callout-drift {
+    border-color: rgba(229,58,58,.18);
+    position: relative; overflow: hidden;
+}
+.callout-drift::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--accent), transparent 60%);
+    opacity: .10;
+    pointer-events: none;
+}
+.callout-drift .callout-value {
+    color: var(--accent);
+    text-shadow: 0 0 18px rgba(229,58,58,.45);
+    position: relative;
+}
 .callout-vs {
     display: grid; place-items: center;
     color: var(--text-dim-2); font-weight: 800;
