@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DRIFT — hybrid analog/digital echo plugin</title>
+  <meta name="description" content="A character-driven echo + ambience plugin in the spirit of the Chase Bliss × Electronic Audio Experiments Big Time. VST3 + standalone. Pairs with SPOOL via LINQ." />
+  <meta name="theme-color" content="#e53a3a" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+  <meta property="og:title" content="DRIFT — Big Time–style echo plugin" />
+  <meta property="og:description" content="Hybrid analog/digital echo with motorised faders, three feedback states, four mode ranges, MOTION + CLUSTER + DIFFUSE, and LINQ to chain with SPOOL." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============================ HEADER NAV ============================ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark">DF-T</span>
+      <span class="brand-name">DRIFT</span>
+    </a>
+    <div class="nav-links">
+      <a href="#origin">Origin</a>
+      <a href="#features">Features</a>
+      <a href="#linq">LINQ</a>
+      <a href="#manual">Manual</a>
+      <a href="#install">Install</a>
+      <a class="nav-suite-pill" href="https://itselliott.github.io/spool/" target="_blank" rel="noopener">SP&middot;L &times; DF-T &rarr;</a>
+      <a class="nav-cta" href="https://github.com/itselliott/drift" target="_blank" rel="noopener">GitHub &rarr;</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================ HERO ============================ -->
+<header id="top" class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-eyebrow">
+        <span class="dot"></span>
+        v1.0.0&nbsp;&middot;&nbsp;VST3&nbsp;+&nbsp;Standalone&nbsp;&middot;&nbsp;Windows&nbsp;/&nbsp;macOS&nbsp;/&nbsp;Linux
+      </div>
+
+      <h1 class="hero-title">
+        <span class="hero-logo">DF-T</span>
+        <span class="hero-wordmark">DRIFT</span>
+      </h1>
+
+      <p class="hero-tagline">
+        a hybrid analog/digital echo &mdash; in the spirit of the
+        <s class="strike">$999</s> Chase&nbsp;Bliss&nbsp;&times;&nbsp;EAE&nbsp;Big&nbsp;Time.
+        Six motorised faders, four feedback states, infinite hold,
+        and a shared-memory link to SP&middot;L.
+      </p>
+
+      <div class="hero-callout-row">
+        <div class="callout-card callout-cb">
+          <div class="callout-label">Big Time hardware</div>
+          <div class="callout-value">$999</div>
+          <div class="callout-fine">USD&nbsp;&middot; pedalboard</div>
+        </div>
+        <div class="callout-vs">vs</div>
+        <div class="callout-card callout-drift">
+          <div class="callout-label">DRIFT plugin</div>
+          <div class="callout-value">$0</div>
+          <div class="callout-fine">free&nbsp;&middot; open source&nbsp;&middot; GPL&minus;3.0</div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <a class="cta cta-primary" href="https://github.com/itselliott/drift/releases/latest" target="_blank" rel="noopener">
+          <span class="cta-icon">&darr;</span>
+          <span>Download&nbsp;v1.0.0</span>
+        </a>
+        <a class="cta cta-ghost" href="https://github.com/itselliott/drift" target="_blank" rel="noopener">
+          <span class="cta-icon">&#9733;</span>
+          <span>Star&nbsp;on&nbsp;GitHub</span>
+        </a>
+        <a class="cta cta-ghost cta-support" href="https://ko-fi.com/itselliott" target="_blank" rel="noopener">
+          <span class="cta-icon">&hearts;</span>
+          <span>Support</span>
+        </a>
+        <a class="cta cta-ghost" href="#install">
+          <span class="cta-icon">&rarr;</span>
+          <span>How&nbsp;to&nbsp;install</span>
+        </a>
+      </div>
+
+      <div class="hero-trust">
+        Built on JUCE&nbsp;8 &middot; C++17 &middot; ships VST3 (Win/Linux) and AU+VST3 (macOS)
+      </div>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <!-- Stylised DRIFT chassis — charcoal faceplate, wood cheeks, OLED + 5
+           cycle buttons, two chrome footswitches. -->
+      <svg class="chassis" viewBox="0 0 460 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"  stop-color="#8a5d3a" />
+            <stop offset=".5" stop-color="#5d3d23" />
+            <stop offset="1"  stop-color="#3a2614" />
+          </linearGradient>
+          <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"  stop-color="#26262c" />
+            <stop offset="1"  stop-color="#16161a" />
+          </linearGradient>
+          <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0"  stop-color="#dadadd" />
+            <stop offset=".5" stop-color="#aaaaae" />
+            <stop offset="1"  stop-color="#6d6d72" />
+          </linearGradient>
+          <linearGradient id="faderHead" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"  stop-color="#dadadd" />
+            <stop offset="1"  stop-color="#7a7a80" />
+          </linearGradient>
+          <linearGradient id="oledGlass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"  stop-color="#1a0606" />
+            <stop offset="1"  stop-color="#0a0202" />
+          </linearGradient>
+        </defs>
+
+        <!-- wood cheeks -->
+        <rect x="6"   y="20" width="22"  height="244" rx="4" fill="url(#wood)" />
+        <rect x="432" y="20" width="22"  height="244" rx="4" fill="url(#wood)" />
+
+        <!-- faceplate -->
+        <rect x="28" y="14" width="404" height="256" rx="6" fill="url(#face)" stroke="#0c0c10" />
+
+        <!-- top wordmark -->
+        <text x="46" y="48" font-family="JetBrains Mono, monospace"
+              font-size="22" font-weight="800" fill="#e6e6ea">DF-T</text>
+
+        <!-- LINQ pill -->
+        <rect x="102" y="32" width="40" height="16" rx="3" fill="#4ac86a" />
+        <text x="122" y="44" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="9" font-weight="800" fill="#0a0a0c"
+              letter-spacing="1">LINQ</text>
+
+        <!-- RESET / SHIFT pills -->
+        <rect x="155" y="32" width="46" height="16" rx="3" fill="#32141c" stroke="#7a3030" />
+        <text x="178" y="44" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="9" font-weight="800" fill="#e53a3a"
+              letter-spacing="1">RESET</text>
+        <rect x="207" y="32" width="46" height="16" rx="3" fill="#1c1422" stroke="#5c3a7a" />
+        <text x="230" y="44" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="9" font-weight="800" fill="#b48aff"
+              letter-spacing="1">SHIFT</text>
+
+        <!-- ECHO ENGINE bar -->
+        <rect x="46" y="60" width="368" height="14" rx="2" fill="#0c0c10" stroke="#26262c" />
+        <text x="230" y="71" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="9" font-weight="700"
+              fill="#888892" letter-spacing="2">ECHO ENGINE</text>
+
+        <!-- six motorised faders -->
+        <g>
+          <!-- COLOR -->
+          <rect x="56"  y="90" width="44" height="80" rx="3" fill="#0c0c10" />
+          <rect x="76"  y="92" width="4"  height="76" fill="#26262c" />
+          <rect x="60"  y="116" width="36" height="14" rx="2" fill="url(#faderHead)" />
+          <line x1="62" y1="123" x2="94" y2="123" stroke="#e53a3a" stroke-width="2" />
+
+          <!-- TIME -->
+          <rect x="116" y="90" width="44" height="80" rx="3" fill="#0c0c10" />
+          <rect x="136" y="92" width="4"  height="76" fill="#26262c" />
+          <rect x="120" y="104" width="36" height="14" rx="2" fill="url(#faderHead)" />
+          <line x1="122" y1="111" x2="154" y2="111" stroke="#d8d8db" stroke-width="2" />
+
+          <!-- CLUSTER -->
+          <rect x="176" y="90" width="44" height="80" rx="3" fill="#0c0c10" />
+          <rect x="196" y="92" width="4"  height="76" fill="#26262c" />
+          <rect x="180" y="134" width="36" height="14" rx="2" fill="url(#faderHead)" />
+          <line x1="182" y1="141" x2="214" y2="141" stroke="#7a8aff" stroke-width="2" />
+
+          <!-- TILT -->
+          <rect x="236" y="90" width="44" height="80" rx="3" fill="#0c0c10" />
+          <rect x="256" y="92" width="4"  height="76" fill="#26262c" />
+          <rect x="240" y="124" width="36" height="14" rx="2" fill="url(#faderHead)" />
+          <line x1="242" y1="131" x2="274" y2="131" stroke="#b48aff" stroke-width="2" />
+
+          <!-- FEEDBACK -->
+          <rect x="296" y="90" width="44" height="80" rx="3" fill="#0c0c10" />
+          <rect x="316" y="92" width="4"  height="76" fill="#26262c" />
+          <rect x="300" y="100" width="36" height="14" rx="2" fill="url(#faderHead)" />
+          <line x1="302" y1="107" x2="334" y2="107" stroke="#ffa62a" stroke-width="2" />
+
+          <!-- WET -->
+          <rect x="356" y="90" width="44" height="80" rx="3" fill="#0c0c10" />
+          <rect x="376" y="92" width="4"  height="76" fill="#26262c" />
+          <rect x="360" y="128" width="36" height="14" rx="2" fill="url(#faderHead)" />
+          <line x1="362" y1="135" x2="394" y2="135" stroke="#4ac86a" stroke-width="2" />
+        </g>
+
+        <!-- twin OLED -->
+        <rect x="138" y="186" width="112" height="34" rx="4" fill="url(#oledGlass)" stroke="#3a1010" />
+        <text x="194" y="212" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="22" font-weight="700"
+              fill="#e53a3a" letter-spacing="3">460</text>
+
+        <rect x="264" y="186" width="56" height="34" rx="4" fill="url(#oledGlass)" stroke="#3a1010" />
+        <text x="292" y="212" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="22" font-weight="700"
+              fill="#e53a3a" letter-spacing="2">02</text>
+
+        <!-- footswitches -->
+        <circle cx="78"  cy="244" r="18" fill="url(#chrome)" stroke="#3a3a40" />
+        <circle cx="78"  cy="244" r="9"  fill="#e53a3a" />
+        <circle cx="382" cy="244" r="18" fill="url(#chrome)" stroke="#3a3a40" />
+        <polygon points="372,254 392,254 382,232" fill="#ffa62a" />
+
+        <!-- HOLD pill (centre footer) -->
+        <rect x="208" y="234" width="44" height="20" rx="4" fill="#181410" stroke="#ffa62a" stroke-opacity=".6" />
+        <text x="230" y="247" text-anchor="middle"
+              font-family="JetBrains Mono, monospace"
+              font-size="10" font-weight="800"
+              fill="#ffa62a" letter-spacing="1">HOLD</text>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<!-- ============================ ORIGIN ============================ -->
+<section id="origin" class="origin">
+  <div class="section-head">
+    <div class="kicker">Origin</div>
+    <h2>The pedal that does the impossible &mdash; in a plugin.</h2>
+    <p class="lede">
+      DRIFT (file name: <span class="mono">DF-T</span>) is an open-source
+      take on the Chase&nbsp;Bliss&nbsp;&times;&nbsp;Electronic&nbsp;Audio&nbsp;Experiments
+      <strong>Big Time</strong> &mdash; a $999 boutique echo pedal beloved for
+      its dreamy ambience, sabotaged feedback character, and the way its
+      six motorised faders snap to recalled presets.
+    </p>
+  </div>
+
+  <div class="origin-grid">
+    <div class="origin-card">
+      <h3>Why a clone?</h3>
+      <p>
+        Big Time inverted the usual delay-pedal hierarchy: instead of one
+        knob per parameter, six full-travel faders for the things you
+        actually move &mdash; <em>COLOR, TIME, CLUSTER, TILT, FEEDBACK, WET</em> &mdash;
+        plus a SHIFT alt-menu hiding another six. The result reads more like
+        a vintage rack delay than a pedal, and it sounds like one too.
+      </p>
+      <p>
+        The pedal is hard to buy and expensive when you find one. DRIFT is
+        a faithful software replication of the control surface, feedback
+        engine, and signal flow &mdash; reimagined for VST3 + standalone use
+        on a modern DAW.
+      </p>
+    </div>
+
+    <div class="origin-card">
+      <h3>The character.</h3>
+      <p>
+        Under the chassis: four delay-time ranges (<strong>MOD / SHORT /
+        LONG / LOOP</strong>), four feedback-character states (<strong>DIGITAL /
+        COMPRESSED / SATURATED / BIAS</strong>), four fixed voicings
+        (<strong>HIFI / FOCUS / WARM / ANALOG</strong>), three motion shapes
+        (sine / square / envelope-stepped), four interval scales for the
+        TIME fader (chromatic, octave+4+5, octave), and three stereo
+        spread modes including ping-pong.
+      </p>
+      <p>
+        Each combination behaves like a different pedal. SATURATED+ANALOG
+        gives you BBD tape feel. DIGITAL+HIFI is a clean PCM-style delay.
+        BIAS+WARM at high feedback degenerates into a beautifully crumbling
+        wash. CLUSTER scatters synced &amp; unsynced taps for 3-zone
+        ambience.
+      </p>
+    </div>
+
+    <div class="origin-card">
+      <h3>And one new thing &mdash; LINQ.</h3>
+      <p>
+        DRIFT ships with a Windows shared-memory link to its sibling plugin
+        <a href="https://itselliott.github.io/spool/" target="_blank" rel="noopener">SP&middot;L</a>.
+        Run them as two standalones, click the green LINQ pill in each
+        chassis, and audio streams from SP&middot;L directly into DRIFT
+        with about one audio-block of latency &mdash; no virtual audio
+        cable, no DAW required. Two plugins, one signal path.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FEATURES ============================ -->
+<section id="features" class="features">
+  <div class="section-head">
+    <div class="kicker">Feature surface</div>
+    <h2>Six faders. Five buttons. Four modes. One signal-flow rabbit hole.</h2>
+    <p class="lede">
+      DRIFT's feel comes from the way every control affects the loop. TILT
+      darkens the tail across passes. CLUSTER scatters taps. STATE
+      reshapes the limiter. MOTION modulates the read-head. All while you
+      reach for the faders and they snap to a preset.
+    </p>
+  </div>
+
+  <div class="feature-grid">
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#9776;</div>
+      <h3>Six motorised faders</h3>
+      <p>COLOR / TIME / CLUSTER / TILT / FEEDBACK / WET. Each fader holds a SHIFT-alt assignment: TEXTURE, RATE, DEPTH, CROSSOVER, DIFFUSE, DRY. Twelve audible parameters from six physical lanes.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#9211;</div>
+      <h3>Four time ranges</h3>
+      <p>MOD (3&ndash;46&nbsp;ms chorus-y mods) &middot; SHORT (46&ndash;736&nbsp;ms slapbacks) &middot; LONG (0.7&ndash;12&nbsp;s washes) &middot; LOOP (multi-second phrase looper with carry-over from LONG).</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#9776;</div>
+      <h3>Four feedback states</h3>
+      <p>DIGITAL (clean, no limiter), COMPRESSED (snappy sag), SATURATED (asymmetric tanh shaper, the default Big-Time sound), BIAS (creeping DC misbias for slow degradation).</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#9728;</div>
+      <h3>Four voicings</h3>
+      <p>HIFI (open and clear) &middot; FOCUS (band-pass-y mid lift) &middot; WARM (PCM-style elliptical-ripple) &middot; ANALOG (BBD-dark with low-shelf cut).</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#9836;</div>
+      <h3>MOTION + SCALE</h3>
+      <p>SINE / SQUARE / ENV (transient-stepped) modulation of the delay tap, optionally quantised by SCALE to CHROMATIC, OCTAVE+4+5, or pure OCTAVE intervals.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&infin;</div>
+      <h3>CLUSTER 3-zone</h3>
+      <p>One fader, three reverbs. 0&ndash;25% synced multi-tap, 25&ndash;75% scattered ambience, 75&ndash;100% drifting diffusion layered on top. The "hold a chord and walk away" mode.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#10227;</div>
+      <h3>Schroeder DIFFUSE</h3>
+      <p>Two-pole allpass diffuser smearing each repeat. DIFFUSE TYPE alt toggle doubles its strength. CHURCH and CHURCH-like presets live here.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#8634;</div>
+      <h3>OVERLOAD + HOLD gestures</h3>
+      <p>Dedicated HOLD button (keyboard&nbsp;<kbd>H</kbd>). In MOD mode ramps COLOR + FEEDBACK to max for momentary chaos. In SHORT/LONG freezes the buffer and forces infinite feedback. In LOOP wipes the loop.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#8645;</div>
+      <h3>Tap tempo + MIDI Clock</h3>
+      <p>TAP footswitch (or <kbd>Space</kbd>) sets the delay centre. MIDI Clock in <em>and</em> out (24 PPQ). Program Change recalls presets 0&ndash;34. CC maps to every fader and cycle button.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#10148;</div>
+      <h3>30 factory presets</h3>
+      <p>Hand-tuned starting points covering every state / mode / motion / voicing combination. Save your own over any slot &mdash; user edits persist between sessions.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#9678;</div>
+      <h3>Options menu</h3>
+      <p>TRAILS (echoes fade after bypass) &middot; DRY KILL (wet-only out) &middot; DRY CLEAN (preamp bypassed on dry) &middot; SCALE IGNORE &middot; STEP &middot; MIDI CLOCK OUT.</p>
+    </article>
+
+    <article class="feature">
+      <div class="feature-icon" aria-hidden="true">&#11107;</div>
+      <h3>LINQ to SP&middot;L</h3>
+      <p>Click the green LINQ pill in DRIFT and the matching pill in SP&middot;L &mdash; audio streams directly between the two standalones via Windows shared memory. <a href="#linq">More &rarr;</a></p>
+    </article>
+  </div>
+</section>
+
+<!-- ============================ LINQ ============================ -->
+<section id="linq" class="linq">
+  <div class="section-head">
+    <div class="kicker">The connection</div>
+    <h2>LINQ &mdash; one chain, two plugins.</h2>
+    <p class="lede">
+      DRIFT and SP&middot;L share a custom Windows shared-memory ring
+      buffer. Enable LINQ in both standalones and audio flows from
+      SP&middot;L's output straight into DRIFT's input &mdash; no virtual
+      audio cable, no DAW, ~one audio-block of latency.
+    </p>
+  </div>
+
+  <div class="linq-frame">
+    <div class="linq-diagram">
+      <div class="linq-node spool">
+        <div class="node-mark">SP&middot;L</div>
+        <div class="node-name">SPOOL</div>
+        <div class="node-role">
+          Sampler / looper /<br />
+          field recorder.<br />
+          <em>Producer.</em>
+        </div>
+      </div>
+
+      <div class="linq-arrow">
+        <span class="linq-pill">LINQ</span>
+        <span class="arrows">&rarr;&rarr;&rarr;</span>
+      </div>
+
+      <div class="linq-node">
+        <div class="node-mark">DF-T</div>
+        <div class="node-name">DRIFT</div>
+        <div class="node-role">
+          Big-Time-style<br />
+          echo + ambience.<br />
+          <em>Consumer.</em>
+        </div>
+      </div>
+    </div>
+
+    <p style="color: var(--text-dim); margin: 0; line-height: 1.65;">
+      DRIFT subscribes to a named shared-memory mapping. SP&middot;L writes
+      its output buffer into the same mapping. A heartbeat in the header
+      lets each side detect whether its partner is alive. Under the hood
+      it's standard Win32 file mapping plus a single-producer / single-
+      consumer lock-free ring buffer &mdash; the trick is no other plugin
+      suite is doing it.
+    </p>
+
+    <div class="linq-steps">
+      <div class="linq-step">
+        <div class="linq-step-num">01</div>
+        <div class="linq-step-text">Run both <strong>SPOOL.exe</strong> and <strong>DRIFT.exe</strong> as standalones.</div>
+      </div>
+      <div class="linq-step">
+        <div class="linq-step-num">02</div>
+        <div class="linq-step-text">Click the <strong>LINQ pill</strong> in each (next to the wordmark).</div>
+      </div>
+      <div class="linq-step">
+        <div class="linq-step-num">03</div>
+        <div class="linq-step-text">Both pills turn <span style="color: var(--green);">green</span> &mdash; audio is flowing.</div>
+      </div>
+      <div class="linq-step">
+        <div class="linq-step-num">04</div>
+        <div class="linq-step-text">Now DRIFT's input is SP&middot;L's output. Play one, echo the other.</div>
+      </div>
+    </div>
+
+    <div class="linq-light-row">
+      <span class="linq-light"><span class="linq-light-dot off"></span>off &mdash; LINQ disabled</span>
+      <span class="linq-light"><span class="linq-light-dot amber"></span>amber &mdash; waiting for partner</span>
+      <span class="linq-light"><span class="linq-light-dot green"></span>green &mdash; linked, audio flowing</span>
+      <span class="linq-light"><span class="linq-light-dot red"></span>red &mdash; sample-rate mismatch (DRIFT only)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MANUAL ============================ -->
+<section id="manual" class="manual">
+  <div class="section-head">
+    <div class="kicker">Manual</div>
+    <h2>Every control on the faceplate.</h2>
+    <p class="lede">
+      The chassis is dense by design &mdash; six faders, five cycle buttons,
+      a SHIFT alt-menu, two footswitches, a HOLD button, and an Options
+      menu. Here's what each does. Hotkeys in brackets work in standalone
+      mode (and most VST3 hosts that forward keys to the editor).
+    </p>
+  </div>
+
+  <!-- Faders -->
+  <div class="manual-grid">
+    <div class="manual-block">
+      <h3>Faders &mdash; main</h3>
+      <dl>
+        <dt>COLOR</dt>
+        <dd>Preamp gain: JFET-style soft clip + low-shelf body boost. At 0 = clean; at 1 = saturated with HF rolloff and 2nd-harmonic enrichment.</dd>
+        <dt>TIME</dt>
+        <dd>Delay-time clock. Range depends on MODE. With SCALE on, snaps to musical intervals. Snaps to centre on TAP or loop DELETE.</dd>
+        <dt>CLUSTER</dt>
+        <dd>Three zones: 0&ndash;25% synced multi-tap, 25&ndash;75% scattered taps, 75&ndash;100% drifting diffusion stacked on top.</dd>
+        <dt>TILT EQ</dt>
+        <dd>Centre = neutral. Up = brighter tail (less LF, more HF). Down = mellower tail. Also controls how the fb-damp LP closes in the feedback path.</dd>
+        <dt>FEEDBACK</dt>
+        <dd>Loop gain. State-dependent: SAT caps at .92, DIGITAL allows .985, LOOP forces &ge;&nbsp;.92 for near-infinite hold.</dd>
+        <dt>WET</dt>
+        <dd>Wet/dry crossfade. Equal-power. At 0 the dry path is the preamp output (unless DRY CLEAN is toggled in Options).</dd>
+      </dl>
+    </div>
+
+    <div class="manual-block">
+      <h3>Faders &mdash; SHIFT alts</h3>
+      <dl>
+        <dt>COLOR &rarr; TEXTURE</dt>
+        <dd>State-character knob. DIGITAL: aliasing + bit-depth crush. COMPRESSED: squeeze amount. SATURATED: clip symmetry. BIAS: creep speed.</dd>
+        <dt>TIME &rarr; RATE</dt>
+        <dd>MOTION speed (~0.2&ndash;15&nbsp;Hz exponential). For ENV motion, controls the glide time between steps.</dd>
+        <dt>CLUSTER &rarr; DEPTH</dt>
+        <dd>MOTION amplitude &mdash; how far the modulator pushes the delay tap. With SCALE on, also controls harmonic interval count.</dd>
+        <dt>TILT &rarr; CROSSOVER</dt>
+        <dd>Sets the LF/HF split frequency for TILT. ~200&nbsp;Hz at 0, ~800&nbsp;Hz centre, ~4&nbsp;kHz at 1.</dd>
+        <dt>FEEDBACK &rarr; DIFFUSE</dt>
+        <dd>Schroeder allpass diffusion network on the wet tap. Smears each repeat into the next. DIFFUSE TYPE alt toggle doubles strength.</dd>
+        <dt>WET &rarr; DRY</dt>
+        <dd>Standalone dry-signal output level (multiplies the dry path independently of WET).</dd>
+      </dl>
+    </div>
+
+    <div class="manual-block">
+      <h3>Cycle buttons</h3>
+      <dl>
+        <dt>SCALE</dt>
+        <dd>Off &middot; CHROMATIC (12-step) &middot; OCT&middot;4&middot;5 (9-step) &middot; OCTAVE (5-step). Quantises TIME.</dd>
+        <dt>MOTION</dt>
+        <dd>Off &middot; SINE &middot; SQUARE &middot; ENV (transient-triggered step sequence). Hold 2s = reset.</dd>
+        <dt>MODE</dt>
+        <dd>MOD &middot; SHORT &middot; LONG &middot; LOOP. Hold 2s = simple-delay reset. LONG&rarr;LOOP carries the buffer over as the initial loop.</dd>
+        <dt>VOICING</dt>
+        <dd>HIFI &middot; FOCUS &middot; WARM &middot; ANALOG. Fixed filter chain on the wet tap.</dd>
+        <dt>STATE</dt>
+        <dd>DIGITAL &middot; COMPRESSED &middot; SATURATED &middot; BIAS. Limiter / feedback shaper personality.</dd>
+        <dt>SHIFT</dt>
+        <dd>Toggles the Alt Menu &mdash; six faders + four cycle buttons swap to their alt assignments.</dd>
+      </dl>
+    </div>
+
+    <div class="manual-block">
+      <h3>Footswitches + HOLD</h3>
+      <dl>
+        <dt>BYPASS &middot; <span class="key">B</span></dt>
+        <dd>Toggle wet engine on/off. With TRAILS enabled (Options), echoes fade naturally instead of cutting.</dd>
+        <dt>TAP &middot; <span class="key">Space</span></dt>
+        <dd>Tap 2&ndash;4 times to lock delay centre. In LOOP mode, advances the looper: STOPPED &rarr; RECORDING &rarr; PLAYING &rarr; OVERDUBBING.</dd>
+        <dt>HOLD &middot; <span class="key">H</span></dt>
+        <dd>Sticky toggle. <strong>MOD</strong>: OVERLOAD (ramps COLOR + FEEDBACK to max while held). <strong>SHORT/LONG</strong>: freezes buffer + infinite feedback. <strong>LOOP</strong>: one-shot DELETE (wipes loop, snaps TIME to centre).</dd>
+        <dt>RESET</dt>
+        <dd>Restores all faders + MODE/STATE to default passthrough. Does NOT clear bypass or LINQ.</dd>
+      </dl>
+    </div>
+
+    <div class="manual-block">
+      <h3>Cycle-button SHIFT alts</h3>
+      <dl>
+        <dt>SCALE &rarr; SPREAD</dt>
+        <dd>Off &middot; SUBTLE widen (mid-side cluster) &middot; PING-PONG (main taps swap L/R).</dd>
+        <dt>MOTION &rarr; 0.5X</dt>
+        <dd>Halves the converter rate and drops bit depth to 12 &mdash; full PCM-42 territory regardless of MODE.</dd>
+        <dt>MODE &rarr; DIFFUSE TYPE</dt>
+        <dd>Doubles the DIFFUSE strength. For maximum ambient smear.</dd>
+        <dt>VOICING &rarr; +12&nbsp;dB</dt>
+        <dd>Quadruples the preamp drive scale (&asymp;&nbsp;+12&nbsp;dB). For quiet inputs or extra-blown effects.</dd>
+      </dl>
+    </div>
+
+    <div class="manual-block">
+      <h3>Presets</h3>
+      <dl>
+        <dt>&lsaquo; / &rsaquo; chevrons</dt>
+        <dd>Cycle presets under the PRESET OLED. The 7-seg shows slot 01&ndash;35.</dd>
+        <dt><span class="key">1</span>&hairsp;&hellip;&hairsp;<span class="key">9</span>, <span class="key">0</span></dt>
+        <dd>Direct-load slots 1&ndash;10 (shift+0 = slot 10).</dd>
+        <dt><span class="key">Shift</span>+<span class="key">S</span></dt>
+        <dd>Save current state to the active slot. User edits persist.</dd>
+        <dt>Dashes (<span class="mono">- -</span>)</dt>
+        <dd>Shown in the PRESET OLED when you've tweaked away from a saved preset.</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Look-up tables -->
+  <div class="manual-grid-2">
+    <div class="manual-pill-table">
+      <h4>Modes (TIME range)</h4>
+      <table>
+        <tr><th>Mode</th><th>Range</th></tr>
+        <tr><td class="lbl">MOD</td>   <td>3&nbsp;&ndash;&nbsp;46&nbsp;ms</td></tr>
+        <tr><td class="lbl">SHORT</td> <td>46&nbsp;&ndash;&nbsp;736&nbsp;ms</td></tr>
+        <tr><td class="lbl">LONG</td>  <td>0.7&nbsp;&ndash;&nbsp;12.2&nbsp;s</td></tr>
+        <tr><td class="lbl">LOOP</td>  <td>1&nbsp;&ndash;&nbsp;29.5&nbsp;s</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>States</h4>
+      <table>
+        <tr><th>State</th><th>Limiter behaviour</th></tr>
+        <tr><td class="lbl">DIGITAL</td>    <td>None &mdash; clean. TEXTURE adds aliasing + bit crush.</td></tr>
+        <tr><td class="lbl">COMPRESSED</td> <td>Soft compressor with sag. TEXTURE morphs squeeze &rarr; ducking.</td></tr>
+        <tr><td class="lbl">SATURATED</td>  <td>Static tanh waveshaper. TEXTURE adds asymmetry.</td></tr>
+        <tr><td class="lbl">BIAS</td>       <td>Creeping DC misbias. TEXTURE = creep speed + clip depth.</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>Voicings</h4>
+      <table>
+        <tr><th>Voicing</th><th>Character</th></tr>
+        <tr><td class="lbl">HIFI</td>   <td>~5&nbsp;kHz LP. Clean &amp; open.</td></tr>
+        <tr><td class="lbl">FOCUS</td>  <td>~6k LP + ~380&nbsp;Hz HP. Mid-forward, focused.</td></tr>
+        <tr><td class="lbl">WARM</td>   <td>~4&nbsp;kHz LP. PCM-style elliptical-ripple.</td></tr>
+        <tr><td class="lbl">ANALOG</td> <td>~2&nbsp;kHz LP + 150&nbsp;Hz HP. BBD-dark.</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>Scales</h4>
+      <table>
+        <tr><th>Scale</th><th>Snap-to</th></tr>
+        <tr><td class="lbl">OFF</td>       <td>Smooth fader, classic delay-time.</td></tr>
+        <tr><td class="lbl">CHROMATIC</td> <td>25 steps, &plusmn;12 semitones around centre.</td></tr>
+        <tr><td class="lbl">OCT&middot;4&middot;5</td> <td>9 steps: &plusmn;2 oct, &plusmn;5th, &plusmn;4th, unison.</td></tr>
+        <tr><td class="lbl">OCTAVE</td>    <td>5 steps: &minus;2, &minus;1, 0, +1, +2 octaves.</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>Motion</h4>
+      <table>
+        <tr><th>Motion</th><th>Modulator</th></tr>
+        <tr><td class="lbl">OFF</td>    <td>No modulation.</td></tr>
+        <tr><td class="lbl">SINE</td>   <td>Continuous, slewed.</td></tr>
+        <tr><td class="lbl">SQUARE</td> <td>Step-jumps, &asymp;&nbsp;3&nbsp;ms slew to avoid clicks.</td></tr>
+        <tr><td class="lbl">ENV</td>    <td>Transient-triggered, 8-step sine sequence.</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>Spread (alt of SCALE)</h4>
+      <table>
+        <tr><th>Spread</th><th>Stereo behaviour</th></tr>
+        <tr><td class="lbl">OFF</td>       <td>Stereo pass-through.</td></tr>
+        <tr><td class="lbl">SUBTLE</td>    <td>30% mid-side widen on the cluster taps.</td></tr>
+        <tr><td class="lbl">PING-PONG</td> <td>Main taps swap L/R; cluster stays normal.</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>Options menu &mdash; <span class="key">O</span></h4>
+      <table>
+        <tr><th>Toggle</th><th>Effect</th></tr>
+        <tr><td class="lbl">TRAILS</td>       <td>Echoes fade naturally after bypass.</td></tr>
+        <tr><td class="lbl">DRY KILL</td>     <td>Wet-only output (zeros the dry path).</td></tr>
+        <tr><td class="lbl">DRY CLEAN</td>    <td>Dry skips the preamp (raw passthrough).</td></tr>
+        <tr><td class="lbl">SCALE IGNORE</td> <td>Motion modulator ignores SCALE quantisation.</td></tr>
+        <tr><td class="lbl">STEP</td>         <td>TAP creates momentary movement (advances ENV step).</td></tr>
+        <tr><td class="lbl">CLOCK OUT</td>    <td>Emits MIDI Clock at 24&nbsp;PPQ from the host BPM.</td></tr>
+      </table>
+    </div>
+
+    <div class="manual-pill-table">
+      <h4>MIDI map</h4>
+      <table>
+        <tr><th>Source</th><th>Mapping</th></tr>
+        <tr><td class="lbl">PC&nbsp;0&ndash;34</td>     <td>Recall preset slot 1&ndash;35.</td></tr>
+        <tr><td class="lbl">Clock&nbsp;0xF8</td>        <td>Lock to host tempo for tap-tempo math.</td></tr>
+        <tr><td class="lbl">CC&nbsp;14&ndash;19</td>    <td>Faders: COLOR / TIME / CLUSTER / TILT / FEEDBACK / WET.</td></tr>
+        <tr><td class="lbl">CC&nbsp;20&ndash;24</td>    <td>Cycle: SCALE / MOTION / MODE / VOICING / STATE.</td></tr>
+        <tr><td class="lbl">CC&nbsp;25&ndash;32</td>    <td>Alt params + TAP/BYPASS.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ PRESETS ============================ -->
+<section class="features">
+  <div class="section-head">
+    <div class="kicker">Factory bank</div>
+    <h2>35 starting points.</h2>
+    <p class="lede">
+      Every state, mode, voicing, motion and scale represented. Cycle them
+      with the chevron buttons under the PRESET OLED, or number keys 1&ndash;9 / 0.
+      Save your own over any slot.
+    </p>
+  </div>
+
+  <div class="presets-table">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Name</th><th>Showcase</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="num">01</td><td class="name">CLEAN ECHO</td>           <td>DIGITAL + HIFI baseline. "Is it working?" reference.</td></tr>
+        <tr><td class="num">02</td><td class="name">WARM CHORUS</td>          <td>MOD + SINE + COMPRESSED + WARM voicing.</td></tr>
+        <tr><td class="num">03</td><td class="name">ROOM SLAP</td>            <td>Short SAT slapback for tape-style doubling.</td></tr>
+        <tr><td class="num">04</td><td class="name">WIDE TRAILS</td>          <td>LONG + COMP + SUBTLE spread. Creamy ambient.</td></tr>
+        <tr><td class="num">05</td><td class="name">OCTAVE STEPS</td>         <td>SCALE OCTAVE + SQUARE motion. Pitch sequencer.</td></tr>
+        <tr><td class="num">06</td><td class="name">DYNAMIC FLEX</td>         <td>ENV motion + BIAS + ANALOG. Plays in to the pick attack.</td></tr>
+        <tr><td class="num">07</td><td class="name">SMEARY WASH</td>          <td>Heavy CLUSTER + DIFFUSE + DIGITAL. Dreamy bloom.</td></tr>
+        <tr><td class="num">08</td><td class="name">ANALOG DREAM</td>         <td>SAT + ANALOG voicing. Dark BBD-style tape.</td></tr>
+        <tr><td class="num">09</td><td class="name">BROKEN TAPE</td>          <td>BIAS at high TEXTURE + wet-only. Dissolves.</td></tr>
+        <tr><td class="num">10</td><td class="name">INFINITE BLOOM</td>       <td>Long sustaining feedback + diffuse. Pad mode.</td></tr>
+        <tr><td class="num">11</td><td class="name">DUB ECHO</td>             <td>Short PING-PONG + COMP. Classic dub bounce.</td></tr>
+        <tr><td class="num">12</td><td class="name">CAVE</td>                 <td>Dark LONG wash + slow sine + BIAS.</td></tr>
+        <tr><td class="num">13</td><td class="name">SHIMMER</td>              <td>SCALE OCTAVE + SQUARE motion = octave-jump shimmer.</td></tr>
+        <tr><td class="num">14</td><td class="name">PING PONG</td>            <td>L/R alternating, no motion, DIGITAL.</td></tr>
+        <tr><td class="num">15</td><td class="name">WET DREAM</td>            <td>Dense PING-PONG with cluster + diffuse.</td></tr>
+        <tr><td class="num">16</td><td class="name">NIGHT FOG</td>            <td>Very dark, SQUARE-step motion, ANALOG voicing.</td></tr>
+        <tr><td class="num">17</td><td class="name">KORG SDD</td>             <td>MOD + SAT + FOCUS. SDD-3000-style chorus echo.</td></tr>
+        <tr><td class="num">18</td><td class="name">PCM42</td>                <td>LONG + BIAS + ANALOG + 0.5X. Lexicon territory.</td></tr>
+        <tr><td class="num">19</td><td class="name">STUTTER</td>              <td>SQUARE + CHROMATIC scale. Glitchy semitone jumps.</td></tr>
+        <tr><td class="num">20</td><td class="name">MELODIC</td>              <td>CHROMATIC + SINE. Melodic delay-time glide.</td></tr>
+        <tr><td class="num">21</td><td class="name">CRYSTAL</td>              <td>Clean, bright HIFI with slight cluster sparkle.</td></tr>
+        <tr><td class="num">22</td><td class="name">FOREVER</td>              <td>Feedback near unity + heavy diffuse. Pad freeze.</td></tr>
+        <tr><td class="num">23</td><td class="name">RAINFALL</td>             <td>ENV + DIFFUSE TYPE + WARM. Note-triggered raindrops.</td></tr>
+        <tr><td class="num">24</td><td class="name">SLAPBACK</td>             <td>Very short SAT slap. Sun Records vibe.</td></tr>
+        <tr><td class="num">25</td><td class="name">WHISPER</td>              <td>Barely-there LONG tail, very low WET.</td></tr>
+        <tr><td class="num">26</td><td class="name">HALL</td>                 <td>Diffuse + cluster + FOCUS. Convolution-hall feel.</td></tr>
+        <tr><td class="num">27</td><td class="name">TAPE LOOP</td>            <td>LOOP mode + BIAS + ANALOG. Chord-hold pad.</td></tr>
+        <tr><td class="num">28</td><td class="name">CHURCH</td>               <td>Long delay + max DIFFUSE TYPE. Cathedral.</td></tr>
+        <tr><td class="num">29</td><td class="name">EAE BIAS</td>             <td>COLOR up + +12&nbsp;dB boost + BIAS + ANALOG.</td></tr>
+        <tr><td class="num">30</td><td class="name">AIR</td>                  <td>Barely-there bright reverb. "Is it on?" preset.</td></tr>
+        <tr><td class="num">31</td><td class="name">OVERLOAD TEST</td>        <td>MOD primed for the HOLD-button OVERLOAD ramp.</td></tr>
+        <tr><td class="num">32</td><td class="name">INFINITE HOLD</td>        <td>SHORT primed for the HOLD-button buffer freeze.</td></tr>
+        <tr><td class="num">33</td><td class="name">LONG HOLD</td>            <td>LONG primed for the HOLD-button drone freeze.</td></tr>
+        <tr><td class="num">34</td><td class="name">CARRY OVER</td>           <td>LONG mode &mdash; cycle MODE &rarr; LOOP to hear the carry-over.</td></tr>
+        <tr><td class="num">35</td><td class="name">PREAMP DRY</td>           <td>High COLOR, low WET. A/B with DRY CLEAN in Options.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================ INSTALL ============================ -->
+<section id="install" class="install">
+  <div class="section-head">
+    <div class="kicker">Get it</div>
+    <h2>Install in 60 seconds.</h2>
+  </div>
+
+  <div class="install-cards">
+
+    <article class="install-card">
+      <div class="install-card-head">
+        <span class="install-badge">VST3</span>
+        <h3>For DAW use</h3>
+      </div>
+      <p>Ableton, FL Studio, Reaper, Bitwig, Cubase, Studio One &mdash; anything VST3-compatible.</p>
+
+      <div class="install-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div>
+            <strong>Grab the build</strong>
+            <p>Download <code>DRIFT.vst3</code> from the latest <a href="https://github.com/itselliott/drift/releases/latest" target="_blank" rel="noopener">GitHub release</a>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Drop it in your VST3 folder</strong>
+            <pre class="copy-block" data-copy="C:\Program Files\Common Files\VST3\"><code>C:\Program Files\Common Files\VST3\</code><button class="copy-btn" type="button" aria-label="Copy">copy</button></pre>
+            <pre class="copy-block" data-copy="~/Library/Audio/Plug-Ins/VST3/"><code>~/Library/Audio/Plug-Ins/VST3/</code><button class="copy-btn" type="button" aria-label="Copy">copy</button></pre>
+            <pre class="copy-block" data-copy="~/.vst3/"><code>~/.vst3/</code><button class="copy-btn" type="button" aria-label="Copy">copy</button></pre>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div>
+            <strong>Rescan plugins</strong>
+            <p>In your DAW's plug-in preferences, rescan. DRIFT appears under <code>itselliott</code>. Drop on an audio track.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="install-card">
+      <div class="install-card-head">
+        <span class="install-badge alt">STANDALONE</span>
+        <h3>For desktop use</h3>
+      </div>
+      <p>No DAW needed. Runs as its own app. Pairs with SP&middot;L via LINQ.</p>
+
+      <div class="install-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div>
+            <strong>Grab the executable</strong>
+            <p>Download <code>DRIFT.exe</code> (Windows) or <code>DRIFT.app</code> (macOS) from the <a href="https://github.com/itselliott/drift/releases/latest" target="_blank" rel="noopener">latest release</a>.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Run it</strong>
+            <p>Double-click. First launch: the standalone window's <em>Options</em> menu lets you pick your audio device and input channel.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div>
+            <strong>(Optional) Click LINQ</strong>
+            <p>If SP&middot;L is running, click the LINQ pill next to the DF-T wordmark &mdash; DRIFT pulls its input from SP&middot;L's output instead of the audio device.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="install-card">
+      <div class="install-card-head">
+        <span class="install-badge build">BUILD</span>
+        <h3>From source</h3>
+      </div>
+      <p>CMake 3.22+, C++17 toolchain (MSVC, Xcode, GCC, Clang). JUCE 8.0.4 is pulled in via FetchContent.</p>
+
+      <div class="install-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <div>
+            <strong>Clone</strong>
+            <pre class="copy-block" data-copy="git clone https://github.com/itselliott/drift.git"><code>git clone https://github.com/itselliott/drift.git</code><button class="copy-btn" type="button" aria-label="Copy">copy</button></pre>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <div>
+            <strong>Configure &amp; build</strong>
+            <pre class="copy-block" data-copy="cmake -S . -B build
+cmake --build build --config Release"><code>cmake -S . -B build
+cmake --build build --config Release</code><button class="copy-btn" type="button" aria-label="Copy">copy</button></pre>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <div>
+            <strong>Find the artefacts</strong>
+            <pre class="copy-block" data-copy="build/DRIFT_artefacts/Release/"><code>build/DRIFT_artefacts/Release/</code><button class="copy-btn" type="button" aria-label="Copy">copy</button></pre>
+            <p>Contains <code>Standalone/</code>, <code>VST3/</code>, and <code>AU/</code> on macOS.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============================ SUPPORT ============================ -->
+<section class="support">
+  <div class="support-inner">
+    <h2>DRIFT is free &amp; open source.</h2>
+    <p>
+      If DRIFT (or its sibling SP&middot;L) earned a spot in your toolbox,
+      you can keep development going with a one-off or recurring
+      contribution. Zero pressure &mdash; both plugins stay free either way.
+    </p>
+    <div class="support-cta">
+      <a class="cta cta-primary" href="https://ko-fi.com/itselliott" target="_blank" rel="noopener">
+        <span class="cta-icon">&hearts;</span>
+        <span>Tip&nbsp;on&nbsp;Ko&minus;fi</span>
+      </a>
+      <a class="cta cta-ghost" href="https://github.com/sponsors/itselliott" target="_blank" rel="noopener">
+        <span class="cta-icon">&#9733;</span>
+        <span>Sponsor&nbsp;on&nbsp;GitHub</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-mark">DF-T</div>
+      <div>
+        <div class="footer-name">DRIFT</div>
+        <div class="footer-tag">A delay that feels like gear.</div>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a href="https://github.com/itselliott/drift" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/itselliott/drift/releases" target="_blank" rel="noopener">Releases</a>
+      <a href="https://github.com/itselliott/drift/issues" target="_blank" rel="noopener">Report a bug</a>
+      <a href="https://github.com/itselliott/drift/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+      <a href="https://itselliott.github.io/spool/" target="_blank" rel="noopener">SP&middot;L &rarr;</a>
+    </div>
+
+    <div class="footer-fine">
+      Built on <a href="https://juce.com" target="_blank" rel="noopener">JUCE</a>&nbsp;&middot; GPL&minus;3.0&nbsp;&middot; not affiliated with Chase Bliss or EAE.<br />
+      &copy; 2026 itselliott.
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+build/
+build-debug/
+out/
+.vs/
+*.user
+*.suo
+*.log
+.idea/
+.vscode/
+CMakeUserPresets.json
+*.aps
+*.tlog
