@@ -7,7 +7,8 @@ namespace
     // bottom. Bigger than a normal stompbox per the Big Time / Automatone
     // language: rack-gear seriousness, not pedalboard footprint.
     constexpr int kWindowW = 760;
-    constexpr int kWindowH = 600;
+    constexpr int kWindowH = 624;       // bumped +24 for the bottom bezel strip
+    constexpr int kBottomBezel = 24;    // brushed-silver maker's-plate at the bottom
     constexpr int kWoodW   = 30;   // width of each wooden side cheek
     constexpr int kBezel   = 14;   // inset on the faceplate before content
 
@@ -464,19 +465,16 @@ public:
         title.setColour (juce::Label::textColourId, kAccent);
         addAndMakeVisible (title);
 
-        subtitle.setText ("Hybrid analog/digital echo  ·  v1.0", juce::dontSendNotification);
+        subtitle.setText ("Hybrid analog/digital echo  -  v1.0", juce::dontSendNotification);
         subtitle.setFont (juce::Font (juce::FontOptions { 13.0f, juce::Font::plain }));
         subtitle.setJustificationType (juce::Justification::centred);
         subtitle.setColour (juce::Label::textColourId, juce::Colours::white.withAlpha (0.75f));
         addAndMakeVisible (subtitle);
 
         body.setText (
-            "Inspired by the early-80s rack delays — Lexicon PCM 70/42, Korg SDD-3000 — "
-            "and the Chase Bliss / Electronic Audio Experiments Big Time pedal.\n\n"
-            "An analog preamp feeds a digital delay engine, which feeds an analog limiter "
-            "in the feedback loop. The limiter compresses, re-amplifies, and compresses "
-            "again — repeats slowly eat themselves.\n\n"
-            "Pairs with SP·L on the same insert chain.",
+            "A hybrid analog/digital echo in the spirit of the Chase Bliss + EAE Big Time. "
+            "Six motorised faders, four feedback states, infinite hold. "
+            "Pairs with SP-L via LINQ.",
             juce::dontSendNotification);
         body.setFont (juce::Font (juce::FontOptions { 12.0f, juce::Font::plain }));
         body.setJustificationType (juce::Justification::topLeft);
@@ -498,12 +496,46 @@ public:
         wireLink (kofiLink, "https://ko-fi.com/itselliott");
         bugLink.setColour (juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
         bugLink.setColour (juce::TextButton::textColourOffId, kAccent);
-        bugLink.onClick = [] {
-            juce::URL ("mailto:elliottdevs@gmail.com"
-                       "?subject=DRIFT%20Bug%20Report"
-                       "&body=DRIFT%20version%3A%201.0.0%0AOS%3A%20%0A%0A"
-                       "What%20happened%3A%0A%0A"
-                       "Steps%20to%20reproduce%3A%0A").launchInDefaultBrowser();
+        bugLink.onClick = [this] {
+            // Pre-fill the bug-report mailto with everything the user would
+            // otherwise have to type — version, OS, host, sample rate, and
+            // the current engine state. JUCE's URL::withParameter handles
+            // RFC-3986 encoding so newlines / spaces / punctuation survive.
+            auto& p = owner.processorRef;
+            const int    slot = p.getCurrentPresetSlot();
+            const juce::String slotStr = slot >= 0
+                ? (juce::String (slot + 1) + " - "
+                       + juce::String (DriftAudioProcessor::getFactoryPresetName (slot)))
+                : juce::String ("(custom — no preset loaded)");
+            const juce::String modeStr    = DriftAudioProcessor::getModeLabel    (p.getMode());
+            const juce::String stateStr   = DriftAudioProcessor::getStateLabel   (p.getState());
+            const juce::String voicingStr = DriftAudioProcessor::getVoicingLabel (p.getVoicing());
+            const double sr = p.getSampleRate();
+            const juce::String osStr = juce::SystemStats::getOperatingSystemName();
+            const bool isStandalone = (p.wrapperType
+                                       == juce::AudioProcessor::wrapperType_Standalone);
+            const juce::String hostStr = isStandalone
+                ? juce::String ("Standalone")
+                : juce::String (juce::PluginHostType().getHostDescription());
+
+            const juce::String body =
+                juce::String ("DRIFT v1.0.0\n")
+                + "OS: "          + osStr      + "\n"
+                + "Host: "        + hostStr    + "\n"
+                + "Sample rate: " + juce::String (sr, 0) + " Hz\n"
+                + "Preset: "      + slotStr    + "\n"
+                + "Mode / State / Voicing: "   + modeStr + " / "
+                                               + stateStr + " / "
+                                               + voicingStr + "\n"
+                + "\n"
+                + "What happened:\n\n\n"
+                + "Steps to reproduce:\n\n\n"
+                + "(Diagnostics above are auto-filled by DRIFT — please don't delete them.)\n";
+
+            juce::URL ("mailto:elliottdevs@gmail.com")
+                .withParameter ("subject", "DRIFT Bug Report")
+                .withParameter ("body", body)
+                .launchInDefaultBrowser();
         };
         addAndMakeVisible (bugLink);
 
@@ -512,6 +544,22 @@ public:
         dismissBtn.setColour (juce::TextButton::textColourOffId, juce::Colours::black);
         dismissBtn.onClick = [this] { owner.aboutOverlay.reset(); };
         addAndMakeVisible (dismissBtn);
+
+        // Persistent "don't show on launch" checkbox. Backed by a JUCE
+        // PropertiesFile so the choice is global to the user (works for
+        // both standalone and VST3 instances).
+        dontShowToggle.setButtonText ("Don't show on launch");
+        dontShowToggle.setColour (juce::ToggleButton::textColourId,
+                                  juce::Colours::white.withAlpha (0.75f));
+        dontShowToggle.setColour (juce::ToggleButton::tickColourId,           kAccent);
+        dontShowToggle.setColour (juce::ToggleButton::tickDisabledColourId,
+                                  juce::Colours::white.withAlpha (0.35f));
+        dontShowToggle.setToggleState (DriftAudioProcessorEditor::getHideAboutOnLaunch(),
+                                       juce::dontSendNotification);
+        dontShowToggle.onClick = [this] {
+            DriftAudioProcessorEditor::setHideAboutOnLaunch (dontShowToggle.getToggleState());
+        };
+        addAndMakeVisible (dontShowToggle);
     }
 
     void paint (juce::Graphics& g) override
@@ -526,19 +574,23 @@ public:
 
     void resized() override
     {
-        auto card = getCardBounds().toNearestInt().reduced (24, 20);
-        title.setBounds    (card.removeFromTop (44));
-        subtitle.setBounds (card.removeFromTop (20));
-        card.removeFromTop (10);
-        body.setBounds     (card.removeFromTop (130));
-        card.removeFromTop (12);
-        auto links = card.removeFromTop (28);
+        // Tighter layout — less empty space between rows; body shorter so
+        // the card doesn't dwarf the chassis.
+        auto card = getCardBounds().toNearestInt().reduced (22, 16);
+        title.setBounds    (card.removeFromTop (38));
+        subtitle.setBounds (card.removeFromTop (18));
+        card.removeFromTop (6);
+        body.setBounds     (card.removeFromTop (80));
+        card.removeFromTop (6);
+        auto links = card.removeFromTop (26);
         const int linkW = links.getWidth() / 3;
         ghLink  .setBounds (links.removeFromLeft (linkW));
         kofiLink.setBounds (links.removeFromLeft (linkW));
         bugLink .setBounds (links);
-        card.removeFromTop (12);
-        dismissBtn.setBounds (card.removeFromTop (32).withSizeKeepingCentre (120, 32));
+        card.removeFromTop (4);
+        dontShowToggle.setBounds (card.removeFromTop (20).withSizeKeepingCentre (200, 20));
+        card.removeFromTop (4);
+        dismissBtn.setBounds (card.removeFromTop (30).withSizeKeepingCentre (120, 30));
     }
 
     void mouseDown (const juce::MouseEvent& e) override
@@ -550,14 +602,15 @@ public:
 private:
     juce::Rectangle<float> getCardBounds() const
     {
-        const float w = juce::jmin (440.0f, (float) getWidth() - 60.0f);
-        const float h = 340.0f;
+        const float w = juce::jmin (420.0f, (float) getWidth() - 60.0f);
+        const float h = 280.0f;
         return { (getWidth() - w) * 0.5f, (getHeight() - h) * 0.5f, w, h };
     }
 
     DriftAudioProcessorEditor& owner;
-    juce::Label      title, subtitle, body;
-    juce::TextButton ghLink, kofiLink, bugLink, dismissBtn;
+    juce::Label        title, subtitle, body;
+    juce::TextButton   ghLink, kofiLink, bugLink, dismissBtn;
+    juce::ToggleButton dontShowToggle;
 };
 
 //==============================================================================
@@ -880,6 +933,33 @@ DriftAudioProcessorEditor::DriftAudioProcessorEditor (DriftAudioProcessor& p)
     holdButton.onClick = [this] { toggleHoldGesture(); };
     addAndMakeVisible (holdButton);
 
+    // ---- OPT button (header) — opens the Options overlay -----------------
+    // Needed because the 'O' hotkey is intercepted by most DAW hosts; this
+    // gives VST3 users a guaranteed path to TRAILS / DRY KILL / etc.
+    optionsBtn.setButtonText ("OPT");
+    optionsBtn.setColour (juce::TextButton::buttonColourId,
+                          juce::Colour::fromRGB (0x18, 0x14, 0x10));
+    optionsBtn.setColour (juce::TextButton::buttonOnColourId, kAccent);
+    optionsBtn.setColour (juce::TextButton::textColourOffId,
+                          juce::Colour::fromRGB (0xc8, 0xb0, 0x82));
+    optionsBtn.setColour (juce::TextButton::textColourOnId, juce::Colours::black);
+    optionsBtn.setLookAndFeel (&pillLnf);
+    optionsBtn.onClick = [this] { showOptionsOverlay(); };
+    addAndMakeVisible (optionsBtn);
+
+    // ---- INFO ("i") button (header) — opens the About / credits overlay --
+    // Always available; reopens the launch credits at any time.
+    aboutBtn.setButtonText ("i");
+    aboutBtn.setColour (juce::TextButton::buttonColourId,
+                        juce::Colour::fromRGB (0x18, 0x14, 0x10));
+    aboutBtn.setColour (juce::TextButton::buttonOnColourId, kAccent);
+    aboutBtn.setColour (juce::TextButton::textColourOffId,
+                        juce::Colour::fromRGB (0xc8, 0xb0, 0x82));
+    aboutBtn.setColour (juce::TextButton::textColourOnId, juce::Colours::black);
+    aboutBtn.setLookAndFeel (&pillLnf);
+    aboutBtn.onClick = [this] { showAboutOverlay(); };
+    addAndMakeVisible (aboutBtn);
+
     // ---- Preset cycler ----------------------------------------------------
     // Prev / next arrow buttons + the loaded preset's name in between.
     auto stylePresetArrow = [this] (juce::TextButton& b, const juce::String& text)
@@ -912,6 +992,18 @@ DriftAudioProcessorEditor::DriftAudioProcessorEditor (DriftAudioProcessor& p)
     });
 
     startTimerHz (30);
+
+    // Show the About / credits overlay on launch by default. The user can
+    // tick "Don't show on launch" inside the overlay to suppress it; that
+    // preference is stored in a JUCE PropertiesFile and survives across
+    // standalone + VST3 + DAW projects.
+    if (! getHideAboutOnLaunch())
+    {
+        juce::Component::SafePointer<DriftAudioProcessorEditor> safe (this);
+        juce::MessageManager::callAsync ([safe] {
+            if (safe != nullptr) safe->showAboutOverlay();
+        });
+    }
 }
 
 DriftAudioProcessorEditor::~DriftAudioProcessorEditor()
@@ -929,6 +1021,8 @@ DriftAudioProcessorEditor::~DriftAudioProcessorEditor()
     linkButton   .setLookAndFeel (nullptr);
     resetButton  .setLookAndFeel (nullptr);
     holdButton   .setLookAndFeel (nullptr);
+    optionsBtn   .setLookAndFeel (nullptr);
+    aboutBtn     .setLookAndFeel (nullptr);
     presetPrevButton.setLookAndFeel (nullptr);
     presetNextButton.setLookAndFeel (nullptr);
     aboutOverlay  .reset();
@@ -1454,12 +1548,13 @@ void DriftAudioProcessorEditor::paint (juce::Graphics& g)
                                                                                : r.getX()),
                             r.getY(), r.getBottom());
     };
+    const float panelH = (float) outer.getHeight() - 8.0f - (float) kBottomBezel;
     const auto leftWood  = juce::Rectangle<float> (4.0f, 4.0f,
                                                    (float) kWoodW,
-                                                   (float) outer.getHeight() - 8.0f);
+                                                   panelH);
     const auto rightWood = juce::Rectangle<float> ((float) outer.getWidth() - (float) kWoodW - 4.0f,
                                                    4.0f, (float) kWoodW,
-                                                   (float) outer.getHeight() - 8.0f);
+                                                   panelH);
     drawWoodCheek (leftWood,  0x10A3);
     drawWoodCheek (rightWood, 0x5C42);
 
@@ -1467,7 +1562,7 @@ void DriftAudioProcessorEditor::paint (juce::Graphics& g)
     const auto faceOuter = juce::Rectangle<float> ((float) (kWoodW + 4),
                                                    4.0f,
                                                    (float) outer.getWidth() - 2.0f * (float) (kWoodW + 4),
-                                                   (float) outer.getHeight() - 8.0f);
+                                                   panelH);
     juce::ColourGradient faceGrad (kPanelHi, faceOuter.getCentreX(), faceOuter.getY(),
                                    kPanelLo, faceOuter.getCentreX(), faceOuter.getBottom(),
                                    false);
@@ -1476,6 +1571,45 @@ void DriftAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillRect (faceOuter);
     g.setColour (kSeam.withAlpha (0.75f));
     g.drawRect (faceOuter, 0.7f);
+
+    // ---- 3b) Bottom brushed-silver bezel + engraved itsELLIOTT signature -
+    // Maker's-plate stripe spanning the full chassis below the wood cheeks
+    // and faceplate. Two-pass paint reads as text stamped INTO the metal.
+    {
+        const float bezelY = panelH + 4.0f;
+        const auto bezel = juce::Rectangle<float> (4.0f, bezelY,
+                                                   (float) outer.getWidth() - 8.0f,
+                                                   (float) kBottomBezel);
+        juce::ColourGradient bezelGrad (
+            juce::Colour::fromRGB (0xd8, 0xd8, 0xdc), bezel.getX(),     bezel.getY(),
+            juce::Colour::fromRGB (0x6d, 0x6d, 0x72), bezel.getX(),     bezel.getBottom(),
+            false);
+        bezelGrad.addColour (0.5, juce::Colour::fromRGB (0xaa, 0xaa, 0xae));
+        g.setGradientFill (bezelGrad);
+        g.fillRect (bezel);
+        // Subtle top seam — emphasises the bezel as a separate plate.
+        g.setColour (juce::Colour::fromRGB (0x05, 0x05, 0x08).withAlpha (0.6f));
+        g.drawHorizontalLine ((int) bezelY, bezel.getX(), bezel.getRight());
+
+        // itsELLIOTT signature — drawn in the THEMED ACCENT colour on a
+        // compact dark "nameplate" rect, sized to hug the text with just a
+        // little breathing room. Repaints every frame so theme changes
+        // update kAccent live.
+        const auto plate = juce::Rectangle<float>::leftTopRightBottom (
+            bezel.getCentreX() - 90.0f,
+            bezel.getY() + 4.0f,
+            bezel.getCentreX() + 90.0f,
+            bezel.getBottom() - 4.0f);
+        g.setColour (juce::Colour::fromRGB (0x12, 0x10, 0x0e));
+        g.fillRoundedRectangle (plate, 2.5f);
+        g.setColour (kAccent.withAlpha (0.55f));
+        g.drawRoundedRectangle (plate.reduced (0.5f), 2.5f, 1.0f);
+        g.setColour (kAccent);
+        g.setFont (juce::Font (juce::FontOptions { 12.0f, juce::Font::bold })
+                       .withExtraKerningFactor (0.18f));
+        g.drawText ("itsELLIOTT", plate.toNearestInt(),
+                    juce::Justification::centred, false);
+    }
 
     // ---- 4) Hex-head chrome screws at the corners ------------------------
     const float screwR = 7.0f;
@@ -1757,6 +1891,9 @@ void DriftAudioProcessorEditor::paint (juce::Graphics& g)
     // ---- 10) Footswitch sub-labels (drawn here so they sit on faceplate) -
     // The actual ICON/circle is drawn by the FootswitchLookAndFeel; we just
     // paint "BYPASS" / "TAP TEMPO" text in the panel area between them.
+
+    // (The "itsELLIOTT" maker's-plate signature is painted on the bottom
+    // brushed-silver bezel in step 3b above, not here on the dark faceplate.)
 }
 
 void DriftAudioProcessorEditor::paintOverChildren (juce::Graphics& g)
@@ -1876,6 +2013,11 @@ void DriftAudioProcessorEditor::resized()
 
     // SHIFT — placed in the top header strip alongside RESET.
     shiftButton.setBounds (face.getX() + 272, face.getY() + 9, 64, 20);
+    // OPT — small pill right of SHIFT. Opens the Options overlay (TRAILS,
+    // DRY KILL, etc.). Visible on the chassis so VST3 users can reach it.
+    optionsBtn.setBounds (face.getX() + 344, face.getY() + 9, 44, 20);
+    // INFO ("i") — small square right of OPT. Reopens the About overlay.
+    aboutBtn  .setBounds (face.getX() + 394, face.getY() + 9, 22, 20);
     layout.removeFromBottom (4);   // gap
     layout.removeFromBottom (14);  // mode/state section bar (painted)
     layout.removeFromBottom (4);
@@ -1924,4 +2066,39 @@ void DriftAudioProcessorEditor::showAboutOverlay()
     addAndMakeVisible (aboutOverlay.get());
     aboutOverlay->setBounds (getLocalBounds());
     aboutOverlay->toFront (true);
+}
+
+// --- Persistent "show credits on launch" preference ----------------------
+// Stored in a small JUCE PropertiesFile so the choice is global to the user
+// across both standalone and VST3 instances and across DAW projects. The
+// flag is semantically "hide": default false → credits show on every launch.
+namespace
+{
+    juce::PropertiesFile::Options driftPrefsOptions()
+    {
+        juce::PropertiesFile::Options o;
+        o.applicationName     = "DRIFT";
+        o.filenameSuffix      = ".settings";
+        o.osxLibrarySubFolder = "Application Support";
+       #if JUCE_LINUX || JUCE_BSD
+        o.folderName          = "~/.config/DRIFT";
+       #else
+        o.folderName          = "DRIFT";
+       #endif
+        return o;
+    }
+    constexpr const char* kHideAboutKey = "hideAboutOnLaunch";
+}
+
+bool DriftAudioProcessorEditor::getHideAboutOnLaunch()
+{
+    juce::PropertiesFile prefs (driftPrefsOptions());
+    return prefs.getBoolValue (kHideAboutKey, false);
+}
+
+void DriftAudioProcessorEditor::setHideAboutOnLaunch (bool hide)
+{
+    juce::PropertiesFile prefs (driftPrefsOptions());
+    prefs.setValue (kHideAboutKey, hide);
+    prefs.saveIfNeeded();
 }

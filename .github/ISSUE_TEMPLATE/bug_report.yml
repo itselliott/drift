@@ -1,0 +1,91 @@
+name: Bug report
+description: Something is broken or behaving unexpectedly in DRIFT.
+labels: ["bug"]
+title: "[bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. The diagnostic fields below let me fix things faster — please don't skip them.
+        If you can also click **Report a Bug** inside DRIFT's About overlay, it pre-fills most of this for you in an email.
+
+  - type: input
+    id: version
+    attributes:
+      label: DRIFT version
+      description: Visible in the About overlay (click the `i` button next to SHIFT).
+      placeholder: "v1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: Plugin format
+      options:
+        - Standalone
+        - VST3
+        - AU
+      default: 0
+    validations:
+      required: true
+
+  - type: input
+    id: host
+    attributes:
+      label: Host / DAW
+      description: e.g. Ableton Live 11.3, FL Studio 21, Reaper 7. Skip if standalone.
+      placeholder: "Ableton Live 11.3 / Standalone"
+
+  - type: input
+    id: os
+    attributes:
+      label: OS + version
+      placeholder: "Windows 11 / macOS 14.3 / Ubuntu 22.04"
+    validations:
+      required: true
+
+  - type: input
+    id: samplerate
+    attributes:
+      label: Sample rate
+      placeholder: "48000 Hz"
+
+  - type: textarea
+    id: settings
+    attributes:
+      label: DRIFT settings when the bug happened
+      description: Mode / State / Voicing / preset slot / LINQ on or off. Anything relevant.
+      placeholder: "Mode: LONG · State: SATURATED · Voicing: ANALOG · Preset 18 (PCM42) · LINQ off"
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Describe the bug. Audio glitch? Visual issue? Crash? Wrong behaviour?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: |
+        1. Load preset 22 (FOREVER)
+        2. Move FEEDBACK to max
+        3. Switch state to BIAS
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      placeholder: "Echo tail should fade smoothly; instead it cuts off at 5 seconds."
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots, audio clips, logs, etc.

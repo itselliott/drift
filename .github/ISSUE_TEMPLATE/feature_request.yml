@@ -1,0 +1,33 @@
+name: Feature request
+description: Suggest a feature, behaviour change, or new preset.
+labels: ["enhancement"]
+title: "[feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea for DRIFT? Tell me what you want and why. Bonus points if it ties to a workflow you're already using.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What you'd like
+      description: One or two sentences. The clearer the better.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why this would help
+      description: |
+        What workflow are you trying to support? What's painful today?
+        ("I want a chord-hold pad button so I don't have to manually freeze the loop.")
+    validations:
+      required: true
+
+  - type: textarea
+    id: refs
+    attributes:
+      label: Reference (optional)
+      description: Pedal, plugin, or hardware that does this well. Audio clips welcome.

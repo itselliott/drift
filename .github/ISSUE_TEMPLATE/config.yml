@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Quick question / discussion
+    url: https://github.com/itselliott/drift/discussions
+    about: For "is this expected?" / "how do I…" / general chat, please use Discussions instead of Issues.
+  - name: Email itselliott directly
+    url: mailto:elliottdevs@gmail.com?subject=DRIFT
+    about: For anything you'd rather not post publicly. DRIFT's About overlay has a "Report a Bug" button that pre-fills your version + state.

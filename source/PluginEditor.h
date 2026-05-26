@@ -63,6 +63,14 @@ public:
     // The standalone Options menu reaches in here to pop the About card.
     void showAboutOverlay();
 
+    // Persistent "show credits on launch" preference, stored in a JUCE
+    // PropertiesFile so the choice survives across both standalone and VST3
+    // instances (and across DAW projects). Default is false → credits show
+    // on every launch. Setting it true via the About-overlay checkbox
+    // suppresses the auto-popup.
+    static bool getHideAboutOnLaunch();
+    static void setHideAboutOnLaunch (bool hide);
+
     enum FaderIdx { FaderColor = 0, FaderTime, FaderCluster, FaderTilt,
                     FaderFeedback, FaderWet, kNumFaders };
 
@@ -179,6 +187,17 @@ private:
     // footer so the user doesn't have to hold the bypass switch for these.
     juce::TextButton holdButton;
     void toggleHoldGesture();    // called by button onClick and 'H' hotkey
+
+    // OPT button — opens the Options Menu overlay (TRAILS / DRY KILL /
+    // DRY CLEAN / SCALE IGNORE / STEP / CLOCK OUT). Needed because the
+    // 'O' hotkey doesn't reach the editor in most VST3 hosts (DAW
+    // intercepts the key) — VST3 users wouldn't otherwise be able to
+    // toggle these options.
+    juce::TextButton optionsBtn;
+    // INFO ("i") button — pops the credits / about overlay. Always
+    // available, so users can re-open the launch credits after they've
+    // dismissed it.
+    juce::TextButton aboutBtn;
 
     // Preset cycler: prev / next buttons + name label between them. Sits
     // above the LINK pill in the footer. Loads the 10 factory presets.
